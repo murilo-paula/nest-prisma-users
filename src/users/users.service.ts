@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, HttpException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt'
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
 
   async create(data: CreateUserDto) {
@@ -34,9 +34,16 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return this.prisma.user.findUnique({
-      where: {email},
-    })
+
+    try {
+      return this.prisma.user.findUnique({
+        where: { email },
+      })
+    } catch (error) {
+        throw new InternalServerErrorException("Houve um erro interno");
+    }
+
+
   }
 
   findAll() {

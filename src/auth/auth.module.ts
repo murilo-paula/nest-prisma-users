@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -8,7 +8,7 @@ import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
-    UsersModule,
+    forwardRef(() => UsersModule), // ✅ agora com forwardRef,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
@@ -16,6 +16,7 @@ import { UsersModule } from '../users/users.module';
     }),
   ],
   providers: [AuthService],
-  controllers: [AuthController]
+  controllers: [AuthController],
+  exports: [JwtModule]
 })
 export class AuthModule {}
